@@ -2,25 +2,33 @@ close all
 clear
 clc
 
-ivDir = 'E:\SOL001_VISIT1\Models\IV\Beads\';
+% You will  need to download the mathworks function sphereFit: https://www.mathworks.com/matlabcentral/fileexchange/34129-sphere-fit-least-squared
 
-list_files = dir([ivDir 'SOL*.iv']);
+% This code will take the rough exported iv files from Mimics, calculate a
+% sphere fit, and then save the centroids of the beads to a text file. 
+% It will also make a WristViz file in the specified iv directory with all
+% the beads and their names that can be used to see all the beads in 3D. 
+
+ivDir = 'E:\SOL001_VISIT1\Models\IV\Beads\'; % the location of the exported bead iv files
+modelsDir = 'E:\SOL001_VISIT1\Models\'; % where the bead positions text file will be written to
+
+list_files = dir([ivDir 'SOL*.iv']); % all the beads are iv files with the subject SOL letters in it
 
 ivstring = createInventorHeader();
 cmap = colormap('jet');
 close all;
-bone_list = {'tib','mt1','tal','cub','nav','mt5','cal','cmm','fib','ph1'};
+bone_list = {'tib','mt1','tal','cub','nav','mt5','cal','cmm','fib','ph1'}; % the bone codes for each bone with beads
 cm = cmap(1:6:end,:);
 
     ind = 1;
-for i = 1:length(list_files)
+for i = 1:length(list_files) % for each bead
     surfaceFile = [ivDir list_files(i).name];
-    [pts cnt] = read_vrml_fast(surfaceFile);
+    [pts, cnt] = read_vrml_fast(surfaceFile); % load the bead
     cnt = cnt + 1;
 
-    [Center,Radius] = sphereFit(pts);
+    [Center,Radius] = sphereFit(pts); % fit a sphere
     
-    if contains(surfaceFile,'out') % if it's a bead not in a bone
+    if contains(surfaceFile,'out') % if it's a bead not in a bone -> some of the foot beads are not within a bone, designated with "out" in the file name
         col = [1 1 1];
     else
         
@@ -40,9 +48,10 @@ for i = 1:length(list_files)
 end
 
   data_vals =  table(bead,centroid);
-  writetable(data_vals,'E:\SOL001_VISIT1\Models\bead_positions.txt')
   
-fid = fopen([ivDir 'SphereFitBeads.iv'],'w');
+  writetable(data_vals,[ modelsDir 'bead_positions.txt']) % where to write the beads centres to
+  
+fid = fopen([ivDir 'SphereFitBeads.iv'],'w'); % write the full bead file
 fprintf(fid,ivstring);
 fclose(fid);
 fprintf(['File written to: ' ivDir 'SphereFitBeads.iv\n'])
