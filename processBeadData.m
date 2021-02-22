@@ -161,7 +161,7 @@ if strcmp(filterOpts.Type(1:2),'2D')  % if the 2D points are being filtered
             bd1i = find(~isnan(bead_init(1,:)));
             bd2i = find(~isnan(bead_init(3,:)));
 %             fprintf('Data from bone %s and bead %i. ', bonesCell{bn},bd)
-            if (length(bd1i) < 5) || (length(bd2i)<5)
+            if (length(bd1i) <= 5) || (length(bd2i)<=5)
                 warning('Missing data from bone %s and bead %i. ', bonesCell{bn},bd)
                 continue
             end
