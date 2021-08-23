@@ -9,15 +9,18 @@ clc
 % It will also make a WristViz file in the specified iv directory with all
 % the beads and their names that can be used to see all the beads in 3D. 
 
-ivDir = 'E:\SOL001_VISIT1\Models\IV\Beads\'; % the location of the exported bead iv files
-modelsDir = 'E:\SOL001_VISIT1\Models\'; % where the bead positions text file will be written to
+ivDir = 'E:\SOL001B\Models\IV\Beads\'; % the location of the exported bead iv files
+modelsDir = 'E:\SOL001B\Models\'; % where the bead positions text file will be written to
 
 list_files = dir([ivDir 'SOL*.iv']); % all the beads are iv files with the subject SOL letters in it
 
 ivstring = createInventorHeader();
-cmap = colormap('jet');
-close all;
+
 bone_list = {'tib','mt1','tal','cub','nav','mt5','cal','cmm','fib','ph1'}; % the bone codes for each bone with beads
+
+
+%%
+cmap = colormap('jet');
 cm = cmap(1:6:end,:);
 
     ind = 1;
