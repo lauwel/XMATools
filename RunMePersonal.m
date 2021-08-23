@@ -5,17 +5,21 @@ clc
 
 % Compute all the transforms for the trials
 
-
-
+file_list = {'T0019_SOL001_nrun_pref_barefoot';...
+            'T0024_SOL001_nrun_rfs_barefoot';...
+            'T0030_SOL001_srun_pref_barefoot';...
+            'T0033_SOL001_srun_pref_barefoot';...
+            'T0034_SOL001_srun_pref_barefoot';...
+            'T0039_SOL001_frun_pref_barefoot'};
 % FILE INFORMATION
 
 subjDir = 'E:\SOL001B\'; % subject directory
-trialName = 'T0088_SOL001_nrun_rfs_minimal'; % the trial name
+trialName = 'T0024_SOL001_nrun_rfs_barefoot';%'T0090_SOL001_nrun_rfs_minimal'; % the trial name
 Fs = 250; % hz
-fc = [10,20]; 
+fc = [50 50];%[10,25]; 
 beadFile = 'E:\SOL001B\Models\bead_positions.txt'; % the bead locations from the CT scan, you get this after running sphereFitToBeads.m
-camDir = fullfile(subjDir,'Calibration\Set 3\MayaCam2\'); % where your Mayacam files are located
- 
+camDir = fullfile(subjDir,'Calibration\Set 1\MayaCam2\'); % where your Mayacam files are located
+ addpath(genpath('C:\Users\welte\Documents\Code\XMATools\'))
 %% IF YOU NEED TO INTERPOLATE: EXPORT A 2D DISTORTED POINTS FILE FROM XMALAB
 in2DFile = fullfile(subjDir,trialName,'XMA_csv',[trialName 'DISTORTED.csv']); % this is the undistorted 2D points file that you exported from XMA lab
 
@@ -25,19 +29,20 @@ interpolateXMA2DPoints(in2DFile,[in2DFile(1:end-4) '_interp.csv'],'fib')
 
 %% FIRST PASS : OPTIMIZE TO FIND MISSING BEADS & PRODUCE UNFILTERED
 % TRANSFORMS AND ANIMATIONS
-
+% for t = length(file_list)
+%     trialName = file_list{t};
 in2DFile = fullfile(subjDir,trialName,'XMA_csv',[trialName 'UNDISTORTED.csv']); % this is the undistorted 2D points file that you exported from XMA lab
 
 filterOpts.Type = 'none'; % this tells the processer to not filter 
-optimizeOpts.Type ='none'; %'optimize'; % this will find positions of missing beads if there is enough other information 
+optimizeOpts.Type ='none'; %'optimize';% % this will find positions of missing beads if there is enough other information 
 optimizeOpts.Bones = {'tib','tal','cal','nav','cmm','cub','mt1'};
 saveOpts.ivDir = fullfile(subjDir,'Models','IV','3Aligned Reduced',filesep);
 saveOpts.animDir = fullfile(subjDir,trialName,'POS',filesep);
 processBeadData(in2DFile,beadFile,camDir,subjDir,trialName,filterOpts,optimizeOpts,saveOpts);
 
 
-%% SECOND PASS : FILTER:
-in2DFile = fullfile(subjDir,trialName,'XMA_csv',[trialName 'UNDISTORTED.csv']); % either the same file as the one above, or if you optimized in the previous step, then use that 2D points file
+% SECOND PASS : FILTER:
+in2DFile = fullfile(subjDir,trialName,'XMA_csv',[trialName 'UNDISTORTED_optimized.csv']); % either the same file as the one above, or if you optimized in the previous step, then use that 2D points file
 filterOpts.Type = '2D';
 filterOpts.Fs = Fs;
     % fc = [w1 w2] This is the filtering frequency. 
@@ -48,7 +53,7 @@ filterOpts.Fc = fc;
 % saveOpts = [];
 
 processBeadData(in2DFile,beadFile,camDir,subjDir,trialName,filterOpts,optimizeOpts,saveOpts);
-
+% end
 %% If you need to add autoscoped frames to the bone transforms file
 
 boneName = 'cal';
